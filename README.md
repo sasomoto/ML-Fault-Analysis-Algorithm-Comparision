@@ -1,2 +1,2 @@
 # ML-Fault-Analysis-Algorithm-Comparision
-This contains the code that I wrote while working on a personal project which was about a comparative analysis of K Nearest Neighbours and Random Forest algorithms by variation of parameters
+This contains the code that I wrote while working on a personal project which was about a comparative analysis of K Nearest Neighbours and Random Forest algorithms by variation of parameters. I wrote this code which includes 4 parameters for the K Nearest Neighbours algorithm and 5 parameters for the Random Forest algorithm. I did this to help my senior as a part of a larger project which I cannot reveal due to confidential reasons. I wrote a code for principal component analysis as well as one without it.
