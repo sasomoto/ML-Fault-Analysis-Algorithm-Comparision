@@ -1,0 +1,105 @@
+//written and tested in google colab
+import pandas as pd
+import numpy as np
+import random as rnd
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC, LinearSVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.linear_model import Perceptron
+from sklearn.linear_model import SGDClassifier
+from sklearn.tree import DecisionTreeClassifier
+
+file_path = "Final_Data_Motor_Fault.xlsx"
+df = pd.read_excel(file_path)
+df_info = df.info()
+df_head = df.head()
+df_info, df_head
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+
+X = df.iloc[:, :-1]
+y = df.iloc[:, -1]
+
+X = X.apply(pd.to_numeric, errors='coerce')
+y = pd.to_numeric(y, errors='coerce')
+
+X.fillna(X.mean(), inplace=True)
+y.fillna(y.mode()[0], inplace=True)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+X_train.shape, X_test.shape, y_train.shape, y_test.shape
+
+from sklearn.metrics import accuracy_score, precision_score, f1_score, classification_report
+from sklearn.model_selection import GridSearchCV
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
+
+model_performance = []
+
+def train_evaluate_model(model, model_name, X_train, y_train, X_test, y_test):
+
+    model.fit(X_train, y_train)
+
+    # Predictions
+    y_pred = model.predict(X_test)
+
+    # Evaluation metrics
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred, average='macro', zero_division=0)
+    f1 = f1_score(y_test, y_pred, average='macro', zero_division=0)
+
+    model_performance.append({
+        "Model": model_name,
+        "Accuracy": accuracy,
+        "Precision": precision,
+        "F1 Score": f1
+    })
+
+    print(f"{model_name} - Accuracy: {accuracy:.2f}, Precision: {precision:.2f}, F1 Score: {f1:.2f}")
+    return model
+
+# Set the parameters(KNN)
+n_neighbors = 4  # You can set this to any integer
+weights = 'uniform'  # or 'distance' or a custom callable function
+algorithm = 'ball_tree'  # or 'ball_tree', 'kd_tree', 'brute'
+p = 1  # Minkowski metric power parameter
+
+# Create the KNeighborsClassifier with the specified parameters
+knn = KNeighborsClassifier(n_neighbors=n_neighbors, weights=weights, algorithm=algorithm, p=p)
+
+# Train and evaluate the model
+train_evaluate_model(knn, "K-Nearest Neighbors", X_train, y_train, X_test, y_test)
+
+# Set the parameters(RF)
+n_estimators = 100  # You can set this to any integer value
+criterion = 'log_loss'  # or 'entropy'
+min_samples_split=2 # You can set this to any integer value
+max_features = 'log2'  # or 'sqrt', 'log2', or any integer/floating-point value
+bootstrap=True # or False
+
+# Create the RandomForestClassifier with the specified parameters
+random_forest = RandomForestClassifier(
+    n_estimators=n_estimators,
+    criterion=criterion,
+    min_samples_split=min_samples_split,
+    max_features=max_features,
+    bootstrap=bootstrap
+)
+# Train and evaluate the model
+train_evaluate_model(random_forest, "Random Forest", X_train, y_train, X_test, y_test)
+# Displaying the performance of all models
+pd.DataFrame(model_performance)
